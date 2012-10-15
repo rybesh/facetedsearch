@@ -9,11 +9,13 @@
 var defaults = {
   items              : [{a:2,b:1,c:2},{a:2,b:2,c:1},{a:1,b:1,c:1},{a:3,b:3,c:1}],
   facets             : {'a': 'Title A', 'b': 'Title B', 'c': 'Title C'},
+  numFacets          : {},
   resultSelector     : '#results',
   facetSelector      : '#facets',
   facetContainer     : '<div class=facetsearch id=<%= id %> ></div>',
   facetTitleTemplate : '<h3 class=facettitle><%= title %></h3>',
   facetListContainer : '<div class=facetlist></div>',
+  facetRangeContainer: '<div class=facetrange id=<%= id %>-range ></div><input class=facetrangevalue readonly type=text id="<%= id %>-range-value" />',
   listItemTemplate   : '<div class=facetitem id="<%= id %>"><%= name %> <span class=facetitemcount>(<%= count %>)</span></div>',
   bottomContainer    : '<div class=bottomline></div>',
   orderByTemplate    : '<div class=orderby><span class="orderby-title">Sort by: </span><ul><% _.each(options, function(value, key) { %>'+
@@ -23,10 +25,11 @@ var defaults = {
   deselectTemplate   : '<div class=deselectstartover>Deselect all filters</div>',
   resultTemplate     : '<div class=facetresultbox><%= name %></div>',
   noResults          : '<div class=results>Sorry, but no items match these criteria</div>',
-  orderByOptions     : {'a': 'by A', 'b': 'by B', 'RANDOM': 'by random'},
+  orderByOptions     : {},
   state              : {
                          orderBy : false,
-                         filters : {}
+                         filters : {},
+                         numFilters : {}
                        },
   showMoreTemplate   : '<a id=showmorebutton>Show more</a>',
   enablePagination   : true,
@@ -71,12 +74,13 @@ jQuery.facetUpdate = function() {
  * initializes all facets and their individual filters 
  */
 function initFacetCount() {
-  _.each(settings.facets, function(facettitle, facet) {
+  var facets = _.keys(settings.facets);
+  _.each(facets, function(facet) {
     settings.facetStore[facet] = {};
   });
   _.each(settings.items, function(item) {
    // intialize the count to be zero
-    _.each(settings.facets, function(facettitle, facet) {
+    _.each(facets, function(facet) {
       if ($.isArray(item[facet])) {
         _.each(item[facet], function(facetitem) {
           settings.facetStore[facet][facetitem] = settings.facetStore[facet][facetitem] || {count: 0, id: _.uniqueId("facet_")}
@@ -84,6 +88,22 @@ function initFacetCount() {
       } else {
         if (item[facet] !== undefined) {
           settings.facetStore[facet][item[facet]] = settings.facetStore[facet][item[facet]] || {count: 0, id: _.uniqueId("facet_")}
+        }
+      }
+    });
+  });
+  var numFacets = _.keys(settings.numFacets);
+  _.each(numFacets, function(facet) {
+    settings.facetStore[facet] = { min: Number.MAX_VALUE, max: -Number.MAX_VALUE };
+  });
+  _.each(settings.items, function(item) {
+    _.each(numFacets, function(facet) {
+      if (item[facet] !== undefined) {
+        if (parseFloat(item[facet]) < settings.facetStore[facet].min) {
+          settings.facetStore[facet].min = parseFloat(item[facet]);
+        }
+        if (parseFloat(item[facet]) > settings.facetStore[facet].max) {
+          settings.facetStore[facet].max = parseFloat(item[facet]);
         }
       }
     });
@@ -134,6 +154,13 @@ function filter() {
         }
       }
     });
+    if (filtersApply) {
+      _.each(settings.state.numFilters, function(filter, facet) {
+        if (parseFloat(item[facet]) < filter[0] || parseFloat(item[facet]) > filter[1]) {
+          filtersApply = false;
+        }
+      });
+    }
     return filtersApply;
   });
   // Update the count for each facet and item:
@@ -172,8 +199,14 @@ function order() {
     settings.currentResults = _.sortBy(settings.currentResults, function(item) {
       if (settings.state.orderBy == 'RANDOM') {
         return Math.random()*10000;
+      } else if (settings.state.orderBy in settings.numFacets) {
+        return parseFloat(item[settings.state.orderBy]);
       } else {
-        return item[settings.state.orderBy];
+        return _.reduce(
+          settings.state.orderBy.split('.'),
+          function (item, k) { return item[k]; }, 
+          item  
+        );
       }
     });
   }
@@ -206,10 +239,12 @@ function toggleFilter(key, value) {
  */
 function createFacetUI() {
   var itemtemplate  = _.template(settings.listItemTemplate);
+  var rangetemplate = _.template(settings.facetRangeContainer);
   var titletemplate = _.template(settings.facetTitleTemplate);
   var containertemplate = _.template(settings.facetContainer);
   
   $(settings.facetSelector).html("");
+  // enumerative facets
   _.each(settings.facets, function(facettitle, facet) {
     var facetHtml     = $(containertemplate({id: facet}));
     var facetItem     = {title: facettitle};
@@ -237,6 +272,41 @@ function createFacetUI() {
     updateFacetUI();
     updateResults();
   });
+  // numeric facets
+  _.each(settings.numFacets, function(facettitle, facet) {
+    var facetHtml     = $(containertemplate({id: facet}));
+    var facetItem     = {title: facettitle};
+    var facetItemHtml = $(titletemplate(facetItem));
+
+    facetHtml.append(facetItemHtml);
+    facetHtml.append($(rangetemplate({id: facet})));
+    $(settings.facetSelector).append(facetHtml);
+    $('#' + facet + '-range').slider({
+      range: true,
+      min: settings.facetStore[facet].min,
+      max: settings.facetStore[facet].max,
+      values: [settings.facetStore[facet].min, settings.facetStore[facet].max],
+      slide: function(event, ui) {
+        $('#' + $(ui.handle).parent().attr("id") + '-value').val(
+          ui.values.join(' - '));
+      },
+      change: function(event, ui) {
+        var facet = $(ui.handle).parent().attr("id").slice(0,-6);
+        settings.state.numFilters[facet] = ui.values;
+        $('#' + $(ui.handle).parent().attr("id") + '-value').val(
+          ui.values.join(' - '));
+        filter();
+        order();
+        updateFacetUI();
+        updateResults();
+      },
+      reset: function() {
+        console.log('called reset on ' + this);
+      }
+    });
+    $('#' + facet + '-range-value').val(
+      settings.facetStore[facet].min + ' - ' + settings.facetStore[facet].max);
+  });  
   // Append total result count
   var bottom = $(settings.bottomContainer);
   countHtml = _.template(settings.countTemplate, {count: settings.currentResults.length});
@@ -261,9 +331,18 @@ function createFacetUI() {
     order();
     updateResults();
   });
+  if ($('.orderbyitem').length == 0) {
+    $('.orderby').hide();
+  }
   // Append deselect filters button
   var deselect = $(settings.deselectTemplate).click(function(event){
     settings.state.filters = {};
+    settings.state.numFilters = {};
+    $('.facetrange').each(function () {
+      var min = $(this).slider("option", "min"),
+          max = $(this).slider("option", "max");        
+      $(this).slider("values", [min,max]);
+    });
     jQuery.facetUpdate();
   });
   $(bottom).append(deselect);
