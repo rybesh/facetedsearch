@@ -33,7 +33,7 @@ $(function(){
     template += '<img src="<%= obj.' + settings.image + ' %>">'
   }
   if ('name' in settings) {
-    if (! settings.name instanceof Array) 
+    if (! (settings.name instanceof Array))
       settings.name = [settings.name]
     template += ('<h4>'
       + _.map(settings.name, function (name) { 
