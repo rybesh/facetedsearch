@@ -76,14 +76,14 @@ var settings =
 // OPTIONAL.
 // If your resources have images, set the value of `image` to the name
 // of the property holding the image URL.
-
-  , image : 'imageURL'
+//
+//  , image : 'imageURL'
 
 // OPTIONAL.
 // If your resources have links, set the value of `link` to the name
 // of the property holding the link URL.
-
-  , link : 'imageURL'
+//
+//  , link : 'imageURL'
 
 // OPTIONAL.
 // If you want to be able to sort your resources by various values,

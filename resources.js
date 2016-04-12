@@ -7,7 +7,6 @@ var resources = {
           "lastname": "Smith"
         },
         "age": "96",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Mouse/0",
         "description": "Sed Ea Amet. Stet Voluptua. Nonumy Magna Takimata ",
         "animal": "Mouse",
         "language": [
@@ -22,7 +21,6 @@ var resources = {
           "lastname": "Johnson"
         },
         "age": "81",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Lion/1",
         "description": "Ut Takimata Sit Aliquyam Labore Aliquyam Sit Sit Lorem Amet. Ipsum Rebum. ",
         "animal": "Lion",
         "language": "Lisp",
@@ -34,7 +32,6 @@ var resources = {
           "lastname": "Williams"
         },
         "age": "24",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Monkey/2",
         "description": "Ut Ut Amet, Voluptua. Diam Sed Sanctus Ipsum Stet Sit Erat, Nonumy ",
         "animal": "Monkey",
         "language": [
@@ -49,7 +46,6 @@ var resources = {
           "lastname": "Brown"
         },
         "age": "33",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Fish/3",
         "description": "Lorem Sanctus Diam Invidunt Dolore Sanctus Ipsum ",
         "animal": "Fish",
         "language": "Smalltalk",
@@ -61,7 +57,6 @@ var resources = {
           "lastname": "Jones"
         },
         "age": "38",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Bird/4",
         "description": "Nonumy Et Gubergren, Tempor Sea Dolores Kasd Eirmod Takimata Dolores ",
         "animal": "Bird",
         "language": "TeX",
@@ -73,7 +68,6 @@ var resources = {
           "lastname": "Miller"
         },
         "age": "28",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Dog/5",
         "description": "Consetetur Elitr, Takimata Kasd Erat, Eirmod ",
         "animal": "Dog",
         "language": "Basic",
@@ -85,7 +79,6 @@ var resources = {
           "lastname": "Davis"
         },
         "age": "80",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Lion/6",
         "description": "Tempor Lorem Rebum. Dolor Kasd Ipsum Elitr, Lorem Diam Sed ",
         "animal": "Lion",
         "language": "Assembly",
@@ -97,7 +90,6 @@ var resources = {
           "lastname": "Garcia"
         },
         "age": "53",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Horse/7",
         "description": "Rebum. Diam Rebum. Sea Sadipscing Ut Et Et Nonumy Ipsum Amet. Amet. Sed Labore ",
         "animal": "Horse",
         "language": "JavaScript",
@@ -109,7 +101,6 @@ var resources = {
           "lastname": "Rodriguez"
         },
         "age": "17",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Mouse/8",
         "description": "No Ut Duo Dolores Ipsum Lorem Duo Sanctus Ipsum At Erat, ",
         "animal": "Mouse",
         "language": "TeX",
@@ -121,7 +112,6 @@ var resources = {
           "lastname": "Wilson"
         },
         "age": "1",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Bird/9",
         "description": "Diam Dolores Dolores Magna Elitr, ",
         "animal": "Bird",
         "language": "Fortran",
@@ -133,7 +123,6 @@ var resources = {
           "lastname": "Martinez"
         },
         "age": "16",
-        "imageURL": "http://flickholdr.iwerk.org/150/100/Bird/10",
         "description": "Amet, Aliquyam No Labore Ea Sanctus Sit Amet, Ipsum Est Erat, ",
         "animal": "Bird",
         "language": "XSLT",
