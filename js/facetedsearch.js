@@ -70,6 +70,13 @@ jQuery.facetUpdate = function() {
  * The following section contains the logic of the faceted search
  */
 
+function getIn(o, path){
+  for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
+    o = o[path[i]];
+  }
+  return o
+}
+
 /**
  * initializes all facets and their individual filters 
  */
@@ -81,13 +88,14 @@ function initFacetCount() {
   _.each(settings.items, function(item) {
    // intialize the count to be zero
     _.each(facets, function(facet) {
-      if ($.isArray(item[facet])) {
-        _.each(item[facet], function(facetitem) {
+      var value = getIn(item, facet)
+      if ($.isArray(value)) {
+        _.each(value, function(facetitem) {
           settings.facetStore[facet][facetitem] = settings.facetStore[facet][facetitem] || {count: 0, id: _.uniqueId("facet_")}
         });
       } else {
-        if (item[facet] !== undefined) {
-          settings.facetStore[facet][item[facet]] = settings.facetStore[facet][item[facet]] || {count: 0, id: _.uniqueId("facet_")}
+        if (value !== undefined) {
+          settings.facetStore[facet][value] = settings.facetStore[facet][value] || {count: 0, id: _.uniqueId("facet_")}
         }
       }
     });
@@ -98,12 +106,13 @@ function initFacetCount() {
   });
   _.each(settings.items, function(item) {
     _.each(numFacets, function(facet) {
-      if (item[facet] !== undefined) {
-        if (parseFloat(item[facet]) < settings.facetStore[facet].min) {
-          settings.facetStore[facet].min = parseFloat(item[facet]);
+      var value = getIn(item, facet)
+      if (value !== undefined) {
+        if (parseFloat(value) < settings.facetStore[facet].min) {
+          settings.facetStore[facet].min = parseFloat(value);
         }
-        if (parseFloat(item[facet]) > settings.facetStore[facet].max) {
-          settings.facetStore[facet].max = parseFloat(item[facet]);
+        if (parseFloat(value) > settings.facetStore[facet].max) {
+          settings.facetStore[facet].max = parseFloat(value);
         }
       }
     });
@@ -143,20 +152,22 @@ function filter() {
   settings.currentResults = _.select(settings.items, function(item) {
     var filtersApply = true;
     _.each(settings.state.filters, function(filter, facet) {
-      if ($.isArray(item[facet])) {
-         var inters = _.intersection(item[facet], filter);
+      var value = getIn(item, facet)
+      if ($.isArray(value)) {
+         var inters = _.intersection(value, filter);
          if (inters.length == 0) {
            filtersApply = false;
          }
       } else {
-        if (filter.length && _.indexOf(filter, item[facet]) == -1) {
+        if (filter.length && _.indexOf(filter, value) == -1) {
           filtersApply = false;
         }
       }
     });
     if (filtersApply) {
       _.each(settings.state.numFilters, function(filter, facet) {
-        if (parseFloat(item[facet]) < filter[0] || parseFloat(item[facet]) > filter[1]) {
+        var value = getIn(item, facet)
+        if (parseFloat(value) < filter[0] || parseFloat(value) > filter[1]) {
           filtersApply = false;
         }
       });
@@ -169,13 +180,14 @@ function filter() {
   // then reduce the items to get the current count for each facet
   _.each(settings.facets, function(facettitle, facet) {
     _.each(settings.currentResults, function(item) {
-      if ($.isArray(item[facet])) {
-        _.each(item[facet], function(facetitem) {
+      var value = getIn(item, facet)
+      if ($.isArray(value)) {
+        _.each(value, function(facetitem) {
           settings.facetStore[facet][facetitem].count += 1;
         });
       } else {
-        if (item[facet] !== undefined) {
-          settings.facetStore[facet][item[facet]].count += 1;
+        if (value !== undefined) {
+          settings.facetStore[facet][value].count += 1;
         }
       }
     });
