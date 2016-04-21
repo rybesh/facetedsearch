@@ -201,13 +201,18 @@ function filter() {
   settings.state.shownResults = 0;
 }
 
+function escape_id(id) {
+  if (! id) return '#' + id
+  return "#" + id.replace( /(:|\.|\[|\]|,)/g, "\\$1" )
+}
+
 /**
  * Orders the currentResults according to the settings.state.orderBy variable
  */ 
 function order() {
   if (settings.state.orderBy) {
     $(".activeorderby").removeClass("activeorderby");
-    $('#orderby_'+settings.state.orderBy).addClass("activeorderby");
+    $(escape_id('orderby_'+settings.state.orderBy)).addClass("activeorderby");
     settings.currentResults = _.sortBy(settings.currentResults, function(item) {
       if (settings.state.orderBy == 'RANDOM') {
         return Math.random()*10000;
@@ -293,19 +298,19 @@ function createFacetUI() {
     facetHtml.append(facetItemHtml);
     facetHtml.append($(rangetemplate({id: facet})));
     $(settings.facetSelector).append(facetHtml);
-    $('#' + facet + '-range').slider({
+    $(escape_id(facet + '-range')).slider({
       range: true,
       min: settings.facetStore[facet].min,
       max: settings.facetStore[facet].max,
       values: [settings.facetStore[facet].min, settings.facetStore[facet].max],
       slide: function(event, ui) {
-        $('#' + $(ui.handle).parent().attr("id") + '-value').val(
+        $(escape_id($(ui.handle).parent().attr("id") + '-value')).val(
           ui.values.join(' - '));
       },
       change: function(event, ui) {
         var facet = $(ui.handle).parent().attr("id").slice(0,-6);
         settings.state.numFilters[facet] = ui.values;
-        $('#' + $(ui.handle).parent().attr("id") + '-value').val(
+        $(escape_id($(ui.handle).parent().attr("id") + '-value')).val(
           ui.values.join(' - '));
         filter();
         order();
@@ -316,7 +321,7 @@ function createFacetUI() {
         console.log('called reset on ' + this);
       }
     });
-    $('#' + facet + '-range-value').val(
+    $(escape_id(facet + '-range-value')).val(
       settings.facetStore[facet].min + ' - ' + settings.facetStore[facet].max);
   });  
   // Append total result count
@@ -386,11 +391,11 @@ function updateFacetUI() {
     _.each(facet, function(filter, filtername){
       var item = {id: filter.id, name: filtername, count: filter.count};
       var filteritem  = $(itemtemplate(item)).html();
-      $("#"+filter.id).html(filteritem);
+      $(escape_id(filter.id)).html(filteritem);
       if (settings.state.filters[facetname] && _.indexOf(settings.state.filters[facetname], filtername) >= 0) {
-        $("#"+filter.id).addClass("activefacet");
+        $(escape_id(filter.id)).addClass("activefacet");
       } else {
-        $("#"+filter.id).removeClass("activefacet");
+        $(escape_id(filter.id)).removeClass("activefacet");
       }
     });
   });
