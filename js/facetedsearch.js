@@ -72,7 +72,11 @@ jQuery.facetUpdate = function() {
 
 function getIn(o, path){
   for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
-    o = o[path[i]];
+    if ($.isArray(o)) {
+      o = o.map(function(x) { return x[path[i]] })
+    } else {
+      o = o[path[i]];
+    }
   }
   return o
 }
